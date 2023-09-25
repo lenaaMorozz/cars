@@ -54,6 +54,16 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarResponseStatistics getStatistics() {
-        return null;
+        long amountCar = carRepository.count();
+        if (amountCar == 0) {
+            return CarResponseStatistics.builder()
+                    .amountCar(amountCar)
+                    .build();
+        }
+        return CarResponseStatistics.builder()
+                .amountCar(amountCar)
+                .dateOfFirstCreation(carRepository.findFirstByOrderByCreateDate().getCreateDate())
+                .dateOfLastCreation(carRepository.findFirstByOrderByCreateDateDesc().getCreateDate())
+                .build();
     }
 }

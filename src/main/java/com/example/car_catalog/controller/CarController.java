@@ -48,5 +48,4 @@ public class CarController {
     public CarResponseStatistics getStatistics() {
         return carService.getStatistics();
     }
-
 }
