@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "car")
@@ -23,4 +24,19 @@ public class CarEntity {
     @CreationTimestamp
     private LocalDateTime createDate;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CarEntity carEntity = (CarEntity) o;
+        return manufacturingYear == carEntity.manufacturingYear
+               && Objects.equals(licensePlate, carEntity.licensePlate)
+               && Objects.equals(color, carEntity.color)
+               && Objects.equals(brand, carEntity.brand);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(licensePlate, color, brand, manufacturingYear);
+    }
 }

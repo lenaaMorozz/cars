@@ -34,12 +34,22 @@ public class CarServiceImpl implements CarService {
                 .brand(request.getBrand())
                 .manufacturingYear(request.getManufacturingYear())
                 .build();
+
+        List<CarEntity> carList = carRepository.findAll();
+        if (carList.stream()
+                .anyMatch(carEntity -> carEntity.equals(newCar))) {
+            throw new RuntimeException();
+        }
+
         return carRepository.save(newCar);
     }
 
     @Override
     public void deleteCar(long id) {
-       carRepository.deleteById(id);
+        if (carRepository.findById(id).isEmpty()) {
+            throw new RuntimeException();
+        }
+        carRepository.deleteById(id);
     }
 
     @Override

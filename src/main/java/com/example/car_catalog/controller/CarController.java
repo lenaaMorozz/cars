@@ -23,14 +23,25 @@ public class CarController {
     }
 
     @PostMapping("/")
-    public long addCar(@RequestBody CarRequest request) {
-        return carService.addCar(request).getId();
+    public ResponseEntity<String> addCar(@RequestBody CarRequest request) {
+       try {
+           return ResponseEntity.ok("Car added, id: " + carService.addCar(request).getId());
+       }
+       catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body("This car already exists");
+       }
     }
 
     @DeleteMapping("/cars/{id}")
     public  ResponseEntity<String> deleteById(@PathVariable long id) {
-            carService.deleteCar(id);
-            return ResponseEntity.ok("Car " + id + " deleted");
+            try {
+                carService.deleteCar(id);
+                return ResponseEntity.ok("Car " + id + " deleted");
+            }
+            catch (RuntimeException e) {
+                return ResponseEntity.badRequest().body("Car not found");
+            }
+
     }
 
     @GetMapping("/cars/statistics")
