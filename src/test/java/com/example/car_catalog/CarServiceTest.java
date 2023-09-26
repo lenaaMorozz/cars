@@ -4,7 +4,6 @@ import com.example.car_catalog.api.request.CarRequest;
 import com.example.car_catalog.entity.CarEntity;
 import com.example.car_catalog.repository.CarRepository;
 import com.example.car_catalog.service.CarServiceImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -60,9 +61,25 @@ public class CarServiceTest {
 
         CarEntity actual = carService.addCar(new CarRequest());
 
-        Assertions.assertEquals(actual, carEntity);
-        Mockito.verify(carRepository, Mockito.times(1))
+        assertEquals(carEntity, actual);
+        verify(carRepository, Mockito.times(1))
                 .save(any(CarEntity.class));
+    }
+
+    @Test
+    public void addCar_shouldThrowException() {
+        CarRequest request = CarRequest.builder()
+                .licensePlate("A100AA159")
+                .brand("Skoda")
+                .color("Black")
+                .manufacturingYear(2023)
+                .build();
+
+        when(carRepository.findAll())
+                .thenReturn(Collections.singletonList(carEntity));
+
+        assertThrows(RuntimeException.class, () ->
+                carService.addCar(request));
     }
 
     @Test
@@ -75,9 +92,17 @@ public class CarServiceTest {
         verify(carRepository, Mockito.times(1))
                 .deleteById(1L);
     }
+    @Test
+    public void deleteCar_shouldThrowException() {
+        when(carRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () ->
+                carService.deleteCar(anyLong()));
+    }
 
     @Test
-    public void getStatistics_shouldCallRepositoryTreeTimes() {
+    public void getStatistics_shouldCallRepositoryThreeTimes() {
         when(carRepository.count()).thenReturn(2L);
         when(carRepository.findFirstByOrderByCreateDate())
                 .thenReturn(carEntity);
