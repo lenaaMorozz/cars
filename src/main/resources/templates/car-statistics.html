@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml" lang="">
+<head>
+    <title>Car statistics</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #50a6ad;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+<h3>Statistics</h3>
+<table>
+    <tr>
+        <th>Amount car</th>
+        <th>Date of first adding car</th>
+        <th>Date of last adding car</th>
+    </tr>
+    <tr>
+        <td th:text="${amountCar}"></td>
+        <td th:if="${firstDate}">
+            <p th:text="${firstDate}"></p>
+        </td>
+        <td th:unless="${firstDate}">
+            <p>-</p>
+        </td>
+        <td th:if="${lastDate}">
+            <p th:text="${lastDate}"></p>
+        </td>
+        <td th:unless="${lastDate}">
+            <p>-</p>
+        </td>
+    </tr>
+</table>
+
+<form th:action="@{/cars}" method="get">
+    <button type="submit">Back</button>
+</form>
+</body>
+</html>

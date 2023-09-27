@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml" lang="">
+<head>
+    <title>Cars</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #50a6ad;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<h2>Cars</h2>
+<table>
+    <tr>
+        <th>License plate</th>
+        <th>Color</th>
+        <th>Brand</th>
+        <th>Manufacturing year</th>
+        <th></th>
+    </tr>
+    <th:block th:each="car : ${cars}">
+        <tr>
+            <td th:text="${car.licensePlate}"></td>
+            <td th:text="${car.color}"></td>
+            <td th:text="${car.brand}"></td>
+            <td th:text="${car.manufacturingYear}"></td>
+            <td>
+                <form th:action="@{'cars/delete-car/' + ${car.id}}" method="post">
+                    <input type="hidden" name="_method" value="delete"/>
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+    </th:block>
+</table>
+
+<form th:action="@{/cars/statistics}" method="get">
+    <button type="submit">View statistics</button>
+</form>
+
+
+<h3>Add Car</h3>
+<form th:action="@{/cars/add-car}" method="post">
+    <label for="licensePlate">License Plate (Example:A100AA159):</label><br>
+    <input type="text" id="licensePlate" name="licensePlate" required><br>
+    <label for="brand">Brand:</label><br>
+    <input type="text" id="brand" name="brand" required><br>
+
+    <label for="manufacturingYear">Manufacturing Year:</label><br>
+    <select id="manufacturingYear" name="manufacturingYear" required>
+        <option th:each="year : ${#numbers.sequence(1970, 2023)}"
+                th:value="${year}"
+                th:text="${year}"
+                th:selected="${year == 2023}"></option>
+    </select><br>
+    <label for="color">Color:</label><br>
+    <input type="text" id="color" name="color" required><br><br>
+    <input type="submit" value="Add Car">
+
+    <div th:if="${message}" style="color: red">
+        <p th:text="${message}"></p>
+    </div>
+</form>
+
+</body>
+</html>

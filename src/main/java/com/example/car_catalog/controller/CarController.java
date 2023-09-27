@@ -7,52 +7,79 @@ import com.example.car_catalog.entity.CarEntity;
 import com.example.car_catalog.service.CarService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 @Slf4j
-@RestController
+@Controller
 @RequiredArgsConstructor
+@RequestMapping("/cars")
 public class CarController {
 
     private final CarService carService;
+    private String message;
 
-    @GetMapping("/cars")
-    public List<CarResponse> getCars() {
-        return carService.getCars();
+    @GetMapping
+    public String getCars(Model model) {
+        List<CarResponse> cars = carService.getCars();
+        model.addAttribute("cars", cars);
+        model.addAttribute("message", message);
+        return "car-list";
     }
 
-    @PostMapping("/")
-    public ResponseEntity<String> addCar(@RequestBody CarRequest request) {
-       try {
-           CarEntity carEntity = carService.addCar(request);
-           log.info("added car by id {}", carEntity.getId());
-           return ResponseEntity.ok("Car added, id: " + carEntity.getId());
-       }
-       catch (RuntimeException e) {
-           log.error("Car not added. This car already exists");
-           return ResponseEntity.badRequest().body("This car already exists");
-       }
+    @PostMapping("/add-car")
+    public String addCar(@RequestParam("licensePlate") String licensePlate,
+                         @RequestParam("color") String color,
+                         @RequestParam("brand") String brand,
+                         @RequestParam("manufacturingYear") int manufacturingYear) {
+        try {
+            CarRequest request = CarRequest.builder()
+                    .licensePlate(licensePlate)
+                    .color(color)
+                    .brand(brand)
+                    .manufacturingYear(manufacturingYear)
+                    .build();
+            CarEntity carEntity = carService.addCar(request);
+            log.info("added car by id {}", carEntity.getId());
+            message = "Car added";
+            return "redirect:/cars";
+        } catch (RuntimeException e) {
+            log.error("Car not added. This car already exists");
+            message = "Car not added. This car already exists";
+            return "redirect:/cars";
+        }
     }
 
-    @DeleteMapping("/cars/{id}")
-    public  ResponseEntity<String> deleteById(@PathVariable long id) {
-            try {
-                carService.deleteCar(id);
-                log.info("deleted car by id {}", id);
-                return ResponseEntity.ok("Car " + id + " deleted");
-            }
-            catch (RuntimeException e) {
-                log.error("Car by {} not deleted. Car not found", id);
-                return ResponseEntity.badRequest().body("Car not found");
-            }
-
+    @DeleteMapping ("/delete-car/{id}")
+    public String deleteById(@PathVariable("id") long id) {
+        try {
+            carService.deleteCar(id);
+            log.info("deleted car by id {}", id);
+            return "redirect:/cars";
+        } catch (RuntimeException e) {
+            log.error("Car by {} not deleted. Car not found", id);
+            return "redirect:/cars";
+        }
     }
 
-    @GetMapping("/cars/statistics")
-    public CarResponseStatistics getStatistics() {
-        return carService.getStatistics();
+    @GetMapping("/statistics")
+    public String getStatistics(Model model) {
+        CarResponseStatistics statistics = carService.getStatistics();
+        model.addAttribute("amountCar", statistics.getAmountCar());
+        LocalDateTime firstDate = statistics.getDateOfFirstCreation();
+        LocalDateTime lastDate = statistics.getDateOfFirstCreation();
+        if (firstDate != null) {
+            model.addAttribute("firstDate", firstDate
+                    .format(DateTimeFormatter.ofPattern("hh:mm:ss dd.MM.yyyy")));
+            model.addAttribute("lastDate", lastDate
+                    .format(DateTimeFormatter.ofPattern("hh:mm:ss dd.MM.yyyy")));
+        }
+        return "car-statistics";
     }
 }
