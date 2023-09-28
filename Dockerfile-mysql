@@ -1,0 +1,10 @@
+FROM mysql:latest
+
+COPY src/main/resources/db/create_db_schema.sql /docker-entrypoint-initdb.d/
+
+ENV MYSQL_ROOT_PASSWORD=pass
+ENV MYSQL_DATABASE=cars
+
+EXPOSE 3306
+
+CMD ["mysqld"]
