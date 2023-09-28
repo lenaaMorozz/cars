@@ -30,6 +30,7 @@ public class CarController {
         List<CarResponse> cars = carService.getCars();
         model.addAttribute("cars", cars);
         model.addAttribute("message", message);
+        message = null;
         return "car-list";
     }
 
@@ -47,7 +48,7 @@ public class CarController {
                     .build();
             CarEntity carEntity = carService.addCar(request);
             log.info("added car by id {}", carEntity.getId());
-            message = "Car added";
+
             return "redirect:/cars";
         } catch (RuntimeException e) {
             log.error("Car not added. This car already exists");
