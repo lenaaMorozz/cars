@@ -65,7 +65,12 @@ public class CarControllerTest {
         when(carService.addCar(any(CarRequest.class)))
                 .thenReturn(carEntity);
 
-        String view = carController.addCar(licensePlate, color, brand, manufacturingYear);
+        String view = carController.addCar(CarRequest.builder()
+                .manufacturingYear(manufacturingYear)
+                .brand(brand)
+                .color(color)
+                .licensePlate(licensePlate)
+                .build());
 
         assertEquals("redirect:/cars", view);
         verify(carService, Mockito.times(1))

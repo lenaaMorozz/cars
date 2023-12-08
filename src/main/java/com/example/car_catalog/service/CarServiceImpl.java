@@ -7,6 +7,7 @@ import com.example.car_catalog.entity.CarEntity;
 import com.example.car_catalog.repository.CarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,12 +22,18 @@ public class CarServiceImpl implements CarService {
         return carRepository.findAll()
                 .stream()
                 .map(carEntity ->
-                        new CarResponse(carEntity.getId(), carEntity.getLicensePlate(), carEntity.getColor(),
-                                carEntity.getBrand(), carEntity.getManufacturingYear()))
+                        CarResponse.builder()
+                                .licensePlate(carEntity.getLicensePlate())
+                                .manufacturingYear(carEntity.getManufacturingYear())
+                                .id(carEntity.getId())
+                                .color(carEntity.getColor())
+                                .brand(carEntity.getBrand())
+                                .build())
                 .toList();
     }
 
     @Override
+    @Transactional
     public CarEntity addCar(CarRequest request) {
         CarEntity newCar = CarEntity.builder()
                 .licensePlate(request.getLicensePlate())
@@ -45,6 +52,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public void deleteCar(long id) {
         if (carRepository.findById(id).isEmpty()) {
             throw new RuntimeException();
@@ -62,8 +70,10 @@ public class CarServiceImpl implements CarService {
         }
         return CarResponseStatistics.builder()
                 .amountCar(amountCar)
-                .dateOfFirstCreation(carRepository.findFirstByOrderByCreateDate().getCreateDate())
-                .dateOfLastCreation(carRepository.findFirstByOrderByCreateDateDesc().getCreateDate())
+                .dateOfFirstCreation(carRepository.
+                        findFirstByOrderByCreateDate().getCreateDate())
+                .dateOfLastCreation(carRepository
+                        .findFirstByOrderByCreateDateDesc().getCreateDate())
                 .build();
     }
 }

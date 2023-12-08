@@ -35,17 +35,8 @@ public class CarController {
     }
 
     @PostMapping("/add-car")
-    public String addCar(@RequestParam("licensePlate") String licensePlate,
-                         @RequestParam("color") String color,
-                         @RequestParam("brand") String brand,
-                         @RequestParam("manufacturingYear") int manufacturingYear) {
+    public String addCar(@RequestBody CarRequest request) {
         try {
-            CarRequest request = CarRequest.builder()
-                    .licensePlate(licensePlate)
-                    .color(color)
-                    .brand(brand)
-                    .manufacturingYear(manufacturingYear)
-                    .build();
             CarEntity carEntity = carService.addCar(request);
             log.info("added car by id {}", carEntity.getId());
 
@@ -57,7 +48,7 @@ public class CarController {
         }
     }
 
-    @DeleteMapping ("/delete-car/{id}")
+    @DeleteMapping("/delete-car/{id}")
     public String deleteById(@PathVariable("id") long id) {
         try {
             carService.deleteCar(id);

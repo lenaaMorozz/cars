@@ -1,0 +1,40 @@
+version: '3.5'
+services:
+  app:
+    image: lenaamorozz/car_catalog:macos
+    container_name: app
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: cars
+      MYSQL_HOSTNAME: db
+      MYSQL_PORT: 3306
+
+    depends_on:
+      - db
+    networks:
+      - car-net
+
+    healthcheck:
+     test: [ "CMD-SHELL", "mysqladmin ping -h db -u root -ppass" ]
+     interval: 10s
+     timeout: 5s
+     retries: 3
+
+  db:
+    image: lenaamorozz/mysql_for_car_catalog:macos
+    container_name: db
+    restart: unless-stopped
+    environment:
+       MYSQL_ROOT_PASSWORD: pass
+       MYSQL_DATABASE: cars
+    ports:
+      - '3306:3306'
+    networks:
+      - car-net
+
+networks:
+ car-net:
+  driver: bridge
